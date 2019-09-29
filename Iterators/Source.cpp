@@ -343,6 +343,18 @@ int main()
 	std::cout << "<< Number Words to Digits >>" << std::endl;
 	{
 		// code goes here
+		std::string str="";
+		std::istringstream stream(nambies);
+		std::ostringstream out;
+		while (stream >> str)
+		{
+			auto begin = std::find_if(numbers.begin(), numbers.end(), [str](const Pube& p)->bool {return (p.str == str); });
+			out << begin->num;
+		}
+		str = out.str();
+		std::cout << str<<std::endl;
+
+
 	}
 	std::cout << "============================================" << std::endl << std::endl;
 
