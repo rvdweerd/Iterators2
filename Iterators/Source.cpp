@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <numeric>
+#include "helperfunctions.h"
 
 class Element
 {
@@ -194,7 +195,7 @@ std::ostream& operator<<(std::ostream& os, const Pube& p)
 	return os;
 }
 
-int main()
+void Homework()
 {
 	////////////////////////////////////////////////////////////////////////////
 	//     !! HOMEWORK !!
@@ -235,7 +236,7 @@ int main()
 	std::cout << "<< Sort Memes >>" << std::endl;
 	{
 		// STEP 1. Create vector with 4x elements of memes
-		/*// Method 1	
+		/*// Method 1
 		std::vector<Pube> sortedMemes(4 * memes.size());// , { 0,"" });
 		int offset = memes.size();
 		auto insert2 = sortedMemes.begin();
@@ -297,13 +298,13 @@ int main()
 		std::sort(sortedMemes.begin(), sortedMemes.end(), [](const Pube& lhs, const Pube& rhs)
 			{
 				return lhs.str < rhs.str;
-			} );
+			});
 
 		// STEP 3. Sort - 2nd sorting run
 		// Method 1: Sort Minor (by meme string name ascenting)
 		/*
-		auto lambSort2 = [] (Pube& lhs, Pube& rhs) 
-		{ 
+		auto lambSort2 = [] (Pube& lhs, Pube& rhs)
+		{
 			return lhs.str < rhs.str;
 		};
 		//auto end1 = std::find_end(sortedMemes.begin(), sortedMemes.end(), sortedMemes.begin(), sortedMemes.begin()+1 );
@@ -333,7 +334,7 @@ int main()
 		}
 		*/
 		// Method 2 (CHILI METHOD)
-		std::copy(sortedMemes.begin(), sortedMemes.end(), std::ostream_iterator<Pube>(std::cout,"\n"));
+		std::copy(sortedMemes.begin(), sortedMemes.end(), std::ostream_iterator<Pube>(std::cout, "\n"));
 	}
 	std::cout << "============================================" << std::endl << std::endl;
 
@@ -343,7 +344,7 @@ int main()
 	std::cout << "<< Number Words to Digits >>" << std::endl;
 	{
 		// code goes here
-		std::string str="";
+		std::string str = "";
 		std::istringstream stream(nambies);
 		std::ostringstream out;
 		while (stream >> str)
@@ -352,7 +353,7 @@ int main()
 			out << begin->num;
 		}
 		str = out.str();
-		std::cout << str<<std::endl;
+		std::cout << str << std::endl;
 
 
 	}
@@ -399,7 +400,49 @@ int main()
 		std::copy(maymays.begin(), maymays.end(), std::ostream_iterator<Pube>(std::cout, "\n"));
 	}
 	std::cout << "============================================" << std::endl << std::endl;
+}
 
+int increment(int x) { return x + 1; }
+
+void ExperimentWithFunctors()
+{
+	int arr[] = { 1,2,3,4,5 };
+	int n = sizeof(arr) / sizeof(arr[0]);
+
+	std::transform( arr, &arr[n], arr, increment );
+	std::transform( arr, &arr[n], arr, [](int& x)->int {return x -5 ; });
+
+	class increment
+	{
+	public:
+		increment()
+			:
+			x(10)
+		{}
+		increment(int x)
+			:
+			x(x)
+		{}
+		int operator()(int in)
+		{
+			return in + x;
+		}
+	private:
+		int x;
+
+	};
+	
+	std::transform( arr, &arr[n], arr, increment(+10) );
+	increment obj(100);
+	std::transform(arr, &arr[n], arr, obj);
+	std::transform(arr, &arr[n], arr, increment()  );
+	PerformTransform(arr, &arr[n], increment(1000) );
+}
+
+int main()
+{
+	ExperimentWithFunctors();
+	//Homework();
 
 
 	std::cin.get();

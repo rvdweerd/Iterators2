@@ -23,5 +23,8 @@
     <ClInclude Include="T15funcs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="helperfunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
