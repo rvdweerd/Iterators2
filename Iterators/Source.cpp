@@ -187,13 +187,38 @@ struct Pube
 };
 
 // write your remove_erase_if template function here!
-
+// Method 1
+/*
+template<class T, typename L>
+void remove_erase_if(T& vec, L lambda)
+{
+	for (auto iter_runner = vec.begin(); iter_runner != vec.end(); )
+	{
+		if (lambda(*iter_runner))
+		{
+			iter_runner = vec.erase(iter_runner);
+		}
+		else
+		{
+			++iter_runner;
+		}
+	}
+}
+*/
+// Method 3 (CHILI METHOD)
+template<class T, typename L>
+void remove_erase_if(T& container, L predicate)
+{
+	const auto new_end = std::remove_if(container.begin(), container.end(), predicate);
+	container.erase(new_end, container.end());
+}
 // write your custom insertion operator here!
 std::ostream& operator<<(std::ostream& os, const Pube& p)
 {
 	os << p.num << ", " << p.str ;
 	return os;
 }
+
 
 void Homework()
 {
@@ -228,7 +253,7 @@ void Homework()
 	};
 	const std::string nambies = "eight one six eight three three eight five four two nine six nine";
 	const std::string numpies = { 6, 6, 5, 0, 6, 1, 8, 6 };
-
+	
 	// Problem 1:
 	// create a vector that contains 4 copies of each of the elements of memes
 	// sort it first by number descending (score from 3 to 1) and then name ascending
@@ -344,6 +369,8 @@ void Homework()
 	std::cout << "<< Number Words to Digits >>" << std::endl;
 	{
 		// code goes here
+		// Method 1: extract nambies strings using stream operations
+		/*
 		std::string str = "";
 		std::istringstream stream(nambies);
 		std::ostringstream out;
@@ -354,8 +381,25 @@ void Homework()
 		}
 		str = out.str();
 		std::cout << str << std::endl;
+		*/
+		// Method 2 (CHILI METHOD)
+		
+		std::istringstream stream(nambies);
+		//std::vector<std::string> tokens{ std::istream_iterator<std::string>(stream >> std::skipws),{} };
 
-
+		std::transform(
+			// this works (with helper function in header file):
+			//std::istream_iterator<std::string>(lvalue(std::istringstream(nambies))),
+			std::istream_iterator<std::string>(stream),
+			std::istream_iterator<std::string>(),
+			std::ostream_iterator<int>(std::cout),
+			[&numbers](std::string str)->int
+			{
+				auto p = std::find_if(numbers.begin(), numbers.end(), [str](const Pube& p)->bool {return (p.str == str); });
+				return p->num;
+			}
+		);
+		
 	}
 	std::cout << "============================================" << std::endl << std::endl;
 
@@ -365,17 +409,82 @@ void Homework()
 	std::cout << "<< Digits to Number Words >>" << std::endl;
 	{
 		// code goes here
+		// Method 1
+		/*
+		// STEP 1: sort the vector "number"
+		std::vector<Pube> numbers2 = numbers;
+		std::sort(numbers2.begin(), numbers2.end());
+		// STEP 2: match digits with numbers by indexing "number" with the tentative digit
+		std::istringstream stream(numpies);
+		char i;
+		while (stream >> i)
+		{
+			std::cout << numbers2[i].str << " ";
+		}
+		*/
+		// Method 2 (CHILI METHOD)
+		
+		auto sorted = numbers;
+		std::sort(sorted.begin(), sorted.end());
+		std::transform(numpies.begin(), numpies.end(), std::ostream_iterator<std::string>(std::cout, " "),
+			[&sorted](char ch) 
+			{
+				return sorted[ch].str;
+			}
+		);
+		std::cout << std::endl;
 	}
 	std::cout << "============================================" << std::endl << std::endl;
 
 	// Problem 4:
 	// find the product of all numbers in nambies
 	// and output of course
+		
 	std::cout << "<< Product >>" << std::endl;
+		
 	{
 		// code goes here
+		/*
+		// Method 1
+		std::istringstream stream(nambies);
+		std::vector<std::string> numberTokens{ std::istream_iterator<std::string>(stream >> std::skipws),{} };
+		int product = 1;
+		for (const std::string& s : numberTokens)
+		{
+			int num = std::find_if(numbers.begin(), numbers.end(), [&s](const Pube& p)->bool { return p.str == s; })->num;
+			product *= num;
+		}
+		std::cout << product << std::endl;
+		*/
+		//Method 2 (CHILI METHOD)
+		std::vector<int> nums;
+		std::istringstream stream(nambies);
+		std::transform(
+			std::istream_iterator<std::string>(stream),
+			std::istream_iterator<std::string>(),
+			std::back_inserter(nums),
+			[&numbers](std::string str)
+			{
+				auto p = std::find_if(numbers.begin(), numbers.end(), [str](const Pube& p)->bool {return (p.str == str); });
+				return p->num;
+			}
+		);
+		/*
+		int product = 1;
+		for (int n : nums)
+		{
+			product *= n;
+		}
+		*/
+		//int product = std::accumulate(nums.begin(), nums.end(), 1, [](int cum, int n) {return cum * n; });
+		int product = std::accumulate(nums.begin(), nums.end(), 1, std::multiplies<int>() );
+
+		std::cout << product << std::endl;
 	}
+	
+	
 	std::cout << "============================================" << std::endl << std::endl;
+
 
 	// Problem 5:
 	// find sums of corresponding nums in numbers and memes
@@ -383,6 +492,20 @@ void Homework()
 	std::cout << "<< Parallel Sum >>" << std::endl;
 	{
 		// code goes here
+		// Method 1
+		/*
+		std::transform(numbers.begin(), numbers.end(), memes.begin(), 
+			std::ostream_iterator<int>(std::cout, ","), 
+			[](const Pube& n, const Pube& m)->int {return n.num + m.num; }
+		);
+		*/
+		// Method 2 (CHILI METHOD)
+		std::transform(numbers.begin(), numbers.end(), memes.begin(),
+			std::ostream_iterator<int>(std::cout, ","), std::plus<int>{}
+		);
+
+		std::cout << std::endl;
+		
 	}
 	std::cout << "============================================" << std::endl << std::endl;
 
@@ -395,7 +518,7 @@ void Homework()
 		// copy to get non-const vector
 		auto maymays = memes;
 		// remove all memes with score below 3
-		//remove_erase_if(maymays, [](const Pube& p) { return p.num < 3; });
+		remove_erase_if(maymays, [](const Pube& p) { return p.num < 3; });
 		// output results
 		std::copy(maymays.begin(), maymays.end(), std::ostream_iterator<Pube>(std::cout, "\n"));
 	}
@@ -403,13 +526,14 @@ void Homework()
 }
 
 int increment(int x) { return x + 1; }
-
 void ExperimentWithFunctors()
 {
 	int arr[] = { 1,2,3,4,5 };
 	int n = sizeof(arr) / sizeof(arr[0]);
 
+	//apply function reference
 	std::transform( arr, &arr[n], arr, increment );
+	//apply a lambda function
 	std::transform( arr, &arr[n], arr, [](int& x)->int {return x -5 ; });
 
 	class increment
@@ -432,6 +556,7 @@ void ExperimentWithFunctors()
 
 	};
 	
+	//different applications of functors
 	std::transform( arr, &arr[n], arr, increment(+10) );
 	increment obj(100);
 	std::transform(arr, &arr[n], arr, obj);
@@ -441,8 +566,8 @@ void ExperimentWithFunctors()
 
 int main()
 {
-	ExperimentWithFunctors();
-	//Homework();
+	//ExperimentWithFunctors();
+	Homework();
 
 
 	std::cin.get();
